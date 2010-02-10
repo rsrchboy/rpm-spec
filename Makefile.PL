@@ -9,7 +9,7 @@ requires 'Moose';
 requires 'MooseX::Types::Path::Class';
 requires 'MooseX::AttributeHelpers';
 requires 'Path::Class';
-requires 'namespace::clean';
+requires 'namespace::autoclean';
 
 test_requires 'Test::More';
 

@@ -18,6 +18,7 @@
 package RPM::Spec;
 
 use Moose;
+use namespace::autoclean;
 
 use MooseX::AttributeHelpers;
 use MooseX::Types::Path::Class ':all';
@@ -26,8 +27,6 @@ use Path::Class;
 #use RPM::Spec::DependencyInfo;
 
 our $VERSION = '0.01';
-
-use namespace::clean;
 
 # debugging
 #use Smart::Comments '###', '####';
@@ -131,7 +130,7 @@ sub _build__requires {
     return \%brs;
 }
 
-1;
+__PACKAGE__->meta->make_immutable;
 
 __END__
 
