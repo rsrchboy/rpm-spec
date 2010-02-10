@@ -54,6 +54,7 @@ has license => (is => 'ro', isa => 'Str', lazy_build => 1);
 has epoch   => (is => 'ro', isa => 'Maybe[Str]', lazy_build => 1);
 has version => (is => 'ro', isa => 'Str', lazy_build => 1);
 has release => (is => 'ro', isa => 'Str', lazy_build => 1);
+has summary => (is => 'ro', isa => 'Str', lazy_build => 1);
 has source0 => (is => 'ro', isa => 'Str', lazy_build => 1);
 has name    => (is => 'ro', isa => 'Str', lazy_build => 1);
 # FIXME should we be a Uri type?
@@ -63,6 +64,7 @@ sub _build_license { shift->_find(sub { /^License:/i    }) }
 sub _build_epoch   { shift->_find(sub { /^Epoch:/i      }) }
 sub _build_version { shift->_find(sub { /^Version:/i    }) }
 sub _build_release { shift->_find(sub { /^Release:/i    }) }
+sub _build_summary { shift->_find(sub { /^Summary:/i    }) }
 sub _build_source0 { shift->_find(sub { /^Source(0|):/i }) }
 sub _build_name    { shift->_find(sub { /^Name:/i       }) }
 sub _build_url     { shift->_find(sub { /^URL:/i        }) }
@@ -87,13 +89,13 @@ has _build_requires => (
     },
 );
 
-sub _build__build_requires { 
+sub _build__build_requires {
     my $self = shift @_;
 
-    my %brs = 
+    my %brs =
         map { my @p = split /\s+/, $_; $p[0] => $p[2] ? $p[2] : 0 }
-        map { $_ =~ s/^BuildRequires:\s*//; $_                    }      
-        $self->grep_content(sub { /^BuildRequires:/i }            ) 
+        map { $_ =~ s/^BuildRequires:\s*//; $_                    }
+        $self->grep_content(sub { /^BuildRequires:/i }            )
         ;
 
     ### %brs
@@ -117,17 +119,42 @@ has _requires => (
     },
 );
 
-sub _build__requires { 
+sub _build__requires {
     my $self = shift @_;
 
-    my %brs = 
+    my %brs =
         map { my @p = split /\s+/, $_; $p[0] => $p[2] ? $p[2] : 0 }
-        map { $_ =~ s/^Requires:\s*//; $_                    }      
-        $self->grep_content(sub { /^Requires:/i }            ) 
+        map { $_ =~ s/^Requires:\s*//; $_                    }
+        $self->grep_content(sub { /^Requires:/i }            )
         ;
 
     ### %brs
     return \%brs;
+}
+
+has _changelog => (
+    metaclass => 'Collection::List',
+
+    is => 'ro',
+    isa => 'ArrayRef[Str]',
+    lazy_build => 1,
+
+    provides => {
+        'empty'    => 'has_changelog',
+        'grep'     => 'grep_changelog',
+        'count'    => 'num_lines_in_changelog', # FIXME
+        'elements' => 'changelog',
+    },
+);
+
+sub _build__changelog {
+    my $self = shift @_;
+
+    my @lines = $self->content;
+    my $line;
+    $line = shift @lines while $line !~ /^%changelog/i;
+
+    return \@lines;
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -235,7 +262,7 @@ L<...>
 
 =head1 BUGS AND LIMITATIONS
 
-Please report problems to Chris Weyl <cweyl@alumni.drew.edu>, or (preferred) 
+Please report problems to Chris Weyl <cweyl@alumni.drew.edu>, or (preferred)
 to this package's RT tracker at <bug-RPM-Spec@rt.cpan.org>.
 
 Patches are welcome.
@@ -260,7 +287,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public
-License along with this library; if not, write to the 
+License along with this library; if not, write to the
 
     Free Software Foundation, Inc.
     59 Temple Place, Suite 330
