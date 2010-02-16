@@ -26,7 +26,7 @@ use MooseX::Types::Path::Class ':all';
 use Path::Class;
 #use RPM::Spec::DependencyInfo;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 # debugging
 #use Smart::Comments '###', '####';
