@@ -85,7 +85,7 @@ has _build_requires => (
         'get'    => 'build_require_version',
         'count'  => 'num_build_requires',
         'keys'   => 'build_requires',
-        # set, etc...?
+        elements => 'full_build_requires',
     },
 );
 
@@ -115,7 +115,7 @@ has _requires => (
         'get'    => 'require_version',
         'count'  => 'num_requires',
         'keys'   => 'requires',
-        # set, etc...?
+        elements => 'full_requires',
     },
 );
 
@@ -132,6 +132,18 @@ sub _build__requires {
     return \%brs;
 }
 
+has _middle => (
+    metaclass => 'Collection::List',
+
+    is  => 'ro',
+    isa => 'ArrayRef[Str]',
+    lazy_build => 1,
+
+    provides => { elements => 'middle' },
+);
+
+sub _build__middle { [ _after('%description', _before('%changelog', shift->content)) ] }
+
 has _changelog => (
     metaclass => 'Collection::List',
 
@@ -147,15 +159,10 @@ has _changelog => (
     },
 );
 
-sub _build__changelog {
-    my $self = shift @_;
+sub _build__changelog { [ _after('%changelog', shift->content) ] }
 
-    my @lines = $self->content;
-    my $line;
-    $line = shift @lines while $line !~ /^%changelog/i;
-
-    return \@lines;
-}
+sub _before { my $sep = shift; $_ = pop   while $_ && !/^$sep/; @_ }
+sub _after  { my $sep = shift; $_ = shift while $_ && !/^$sep/; @_ }
 
 __PACKAGE__->meta->make_immutable;
 
@@ -216,6 +223,15 @@ present, undef is returned.
 Note this will pick up from either of "Source" or "Source0" tags.
 
 =item B<name>
+
+=item B<url>
+
+=item B<summary>
+
+=item B<middle>
+
+The "middle" of a spec; e.g. everything from the first %description until the
+changelog starts.
 
 =back
 
