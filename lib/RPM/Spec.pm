@@ -161,8 +161,9 @@ has _changelog => (
 
 sub _build__changelog { [ _after('%changelog', shift->content) ] }
 
-sub _before { my $sep = shift; $_ = pop   while $_ && !/^$sep/; @_ }
-sub _after  { my $sep = shift; $_ = shift while $_ && !/^$sep/; @_ }
+sub _before  { my $sep = shift @_; my @l; do { return @l if /^$sep/; push @l, $_ } for @_ }
+sub _after   { reverse _before(shift, reverse @_) }
+
 
 __PACKAGE__->meta->make_immutable;
 
