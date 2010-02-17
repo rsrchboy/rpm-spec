@@ -21,6 +21,7 @@ use Moose;
 use namespace::autoclean;
 
 use MooseX::AttributeHelpers;
+use MooseX::Types::Moose ':all';
 use MooseX::Types::Path::Class ':all';
 
 use Path::Class;
@@ -31,7 +32,13 @@ our $VERSION = '0.03';
 # debugging
 #use Smart::Comments '###', '####';
 
+#############################################################################
+
 has specfile => (is => 'ro', isa => File, coerce => 1, required => 1);
+
+has filter_magic => (is => 'ro', isa => Bool, coerce => 1, default => 1);
+
+#############################################################################
 
 has _content => (
     metaclass => 'Collection::List',
@@ -127,6 +134,9 @@ sub _build__requires {
         map { $_ =~ s/^Requires:\s*//; $_                    }
         $self->grep_content(sub { /^Requires:/i }            )
         ;
+
+    # only one "magic" requires at the moment
+    delete $brs{'perl(:MODULE_COMPAT_%(eval'} if $self->filter_magic;
 
     ### %brs
     return \%brs;
