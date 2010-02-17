@@ -6,6 +6,7 @@ author   'Chris Weyl <cweyl@alumni.drew.edu>';
 license  'lgpl';
 
 requires 'Moose';
+requires 'MooseX::Types::Moose';
 requires 'MooseX::Types::Path::Class';
 requires 'MooseX::AttributeHelpers';
 requires 'Path::Class';
