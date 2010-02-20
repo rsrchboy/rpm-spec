@@ -20,14 +20,13 @@ package RPM::Spec;
 use Moose;
 use namespace::autoclean;
 
-use MooseX::AttributeHelpers;
 use MooseX::Types::Moose ':all';
 use MooseX::Types::Path::Class ':all';
 
 use Path::Class;
 #use RPM::Spec::DependencyInfo;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 # debugging
 #use Smart::Comments '###', '####';
@@ -41,17 +40,13 @@ has filter_magic => (is => 'ro', isa => Bool, coerce => 1, default => 1);
 #############################################################################
 
 has _content => (
-    metaclass => 'Collection::List',
+    traits => [ 'Array' ], is => 'ro', isa => 'ArrayRef[Str]', lazy_build => 1,
 
-    is => 'ro',
-    isa => 'ArrayRef[Str]',
-    lazy_build => 1,
-
-    provides => {
-        'empty'    => 'has_content',
-        'grep'     => 'grep_content',
-        'count'    => 'num_lines_in_content', # FIXME
-        'elements' => 'content',
+    handles => {
+        has_content          => 'count',
+        num_lines_in_content => 'count',
+        grep_content         => 'grep',
+        content              => 'elements',
     },
 );
 
@@ -80,19 +75,15 @@ sub _build_url     { shift->_find(sub { /^URL:/i        }) }
 sub _find { (split /\s+/, (shift->grep_content(shift))[0], 2)[1] }
 
 has _build_requires => (
-    metaclass => 'Collection::Hash',
+    traits => [ 'Hash' ], is => 'ro', isa => 'HashRef', lazy_build => 1,
 
-    is         => 'ro',
-    isa        => 'HashRef',
-    lazy_build => 1,
-
-    provides => {
-        'empty'  => 'has_build_requires',
-        'exists' => 'has_build_require',
-        'get'    => 'build_require_version',
-        'count'  => 'num_build_requires',
-        'keys'   => 'build_requires',
-        elements => 'full_build_requires',
+    handles => {
+        has_build_requires    => 'count',
+        has_build_require     => 'exists',
+        build_require_version => 'get',
+        num_build_requires    => 'count',
+        build_requires        => 'keys',
+        full_build_requires   => 'elements',
     },
 );
 
@@ -110,19 +101,15 @@ sub _build__build_requires {
 }
 
 has _requires => (
-    metaclass => 'Collection::Hash',
+    traits => [ 'Hash' ], is => 'ro', isa => 'HashRef', lazy_build => 1,
 
-    is         => 'ro',
-    isa        => 'HashRef',
-    lazy_build => 1,
-
-    provides => {
-        'empty'  => 'has_requires',
-        'exists' => 'has_require',
-        'get'    => 'require_version',
-        'count'  => 'num_requires',
-        'keys'   => 'requires',
-        elements => 'full_requires',
+    handles => {
+        has_requires    => 'count',
+        has_require     => 'exists',
+        require_version => 'get',
+        num_requires    => 'count',
+        requires        => 'keys',
+        full_requires   => 'elements',
     },
 );
 
@@ -143,29 +130,19 @@ sub _build__requires {
 }
 
 has _middle => (
-    metaclass => 'Collection::List',
-
-    is  => 'ro',
-    isa => 'ArrayRef[Str]',
-    lazy_build => 1,
-
-    provides => { elements => 'middle' },
+    traits => ['Array'], is => 'ro', isa => 'ArrayRef[Str]', lazy_build => 1,
+    handles => { middle => 'elements' },
 );
 
 sub _build__middle { [ _after('%description', _before('%changelog', shift->content)) ] }
 
 has _changelog => (
-    metaclass => 'Collection::List',
-
-    is => 'ro',
-    isa => 'ArrayRef[Str]',
-    lazy_build => 1,
-
-    provides => {
-        'empty'    => 'has_changelog',
-        'grep'     => 'grep_changelog',
-        'count'    => 'num_lines_in_changelog', # FIXME
-        'elements' => 'changelog',
+    traits => ['Array'], is => 'ro', isa => 'ArrayRef[Str]', lazy_build => 1,
+    handles => {
+        has_changelog          => 'count',
+        grep_changelog         => 'grep',
+        num_lines_in_changelog => 'count',
+        changelog              => 'elements',
     },
 );
 

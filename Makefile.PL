@@ -5,10 +5,9 @@ all_from 'lib/RPM/Spec.pm';
 author   'Chris Weyl <cweyl@alumni.drew.edu>';
 license  'lgpl';
 
-requires 'Moose';
+requires 'Moose' => '0.92';
 requires 'MooseX::Types::Moose';
 requires 'MooseX::Types::Path::Class';
-requires 'MooseX::AttributeHelpers';
 requires 'Path::Class';
 requires 'namespace::autoclean';
 
