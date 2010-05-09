@@ -1,42 +1,102 @@
-RPM-Spec
+NAME
+    RPM::Spec - A very simplistic read-only method of accessing RPM spec
+    files
 
-INSTALLATION
+SYNOPSIS
+        use RPM::Spec;
 
-To install this module, run the following commands:
+        my $spec = RPM::Spec->new('path/to/my.spec');
 
-	perl Makefile.PL
-	make
-	make test
-	make install
+        say 'Version is: ' . $spec->version;
+        say 'Spec has an epoch' if $spec->has_epoch;
 
-SUPPORT AND DOCUMENTATION
+DESCRIPTION
+    WARNING: This code is actively being worked on, and the API may change.
 
-After installing, you can find documentation for this module with the
-perldoc command.
+    RPM::Spec provides simplistic access to the different bits of
+    information a spec file provides... It is basically a collection of
+    different parsing routines that were scattered through a bunch of other
+    modules.
 
-    perldoc RPM::Spec
+CLASS FUNCTIONS
+    new(specfile => [Str|File])
+        Create a new RPM::Specfile object. The only required parameter is
+        'specfile', which is either a string or Path::Class::File object
+        pointing to the location of the specfile.
 
-You can also look for information at:
+METHODS
+  Tag Functions
+    These methods each return the value of the given tag. If the tag is not
+    present, undef is returned.
 
-    RT, CPAN's request tracker
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=RPM-Spec
+    license
+    epoch
+    release
+    version
+    source0
+        Note this will pick up from either of "Source" or "Source0" tags.
 
-    AnnoCPAN, Annotated CPAN documentation
-        http://annocpan.org/dist/RPM-Spec
+    name
+    url
+    summary
+    middle
+        The "middle" of a spec; e.g. everything from the first %description
+        until the changelog starts.
 
-    CPAN Ratings
-        http://cpanratings.perl.org/d/RPM-Spec
+  Dependency Functions
+    Documentation as this interface is likely to change in the Very Near
+    Future.
 
-    Search CPAN
-        http://search.cpan.org/dist/RPM-Spec/
+  Content Functions
+    content()
+        Returns an array of strings representing the specfile.
 
+    has_content
+        Is the file empty?
 
-COPYRIGHT AND LICENCE
+    num_lines_in_content
+        Returns the line count of the specfile.
 
-Copyright (C) 2009 Chris Weyl
+    grep_content(sub { ... })
+        Given a coderef, greps through the content with it. See also grep.
 
-This library is free software; you can redistribute it and/or
-modify it under the terms of the GNU Lesser General Public
-License as published by the Free Software Foundation; either
-version 2.1 of the License, or (at your option) any later version.
+CAVEATS
+  No macro parsing
+    Macros are not evaluated. e.g., if "Release: 1%{?dist}" is in your spec
+    file, "1%{?dist}" will be returned by release().
+
+  Read only!
+    We can't make any changes.
+
+SEE ALSO
+    ...
+
+BUGS AND LIMITATIONS
+    Please report problems to Chris Weyl <cweyl@alumni.drew.edu>, or
+    (preferred) to this package's RT tracker at <bug-RPM-Spec@rt.cpan.org>.
+
+    Patches are welcome.
+
+AUTHOR
+    Chris Weyl <cweyl@alumni.drew.edu>
+
+LICENSE AND COPYRIGHT
+    Copyright (c) 2009 Chris Weyl <cweyl@alumni.drew.edu>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the terms of the GNU Lesser General Public License as published by
+    the Free Software Foundation; either version 2.1 of the License, or (at
+    your option) any later version.
+
+    This library is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser
+    General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with this library; if not, write to the
+
+        Free Software Foundation, Inc.
+        59 Temple Place, Suite 330
+        Boston, MA  02111-1307  USA
 

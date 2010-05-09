@@ -1,0 +1,129 @@
+# NAME
+
+RPM::Spec - A very simplistic read-only method of accessing RPM spec files
+
+# SYNOPSIS
+
+    use RPM::Spec;
+
+    my $spec = RPM::Spec->new('path/to/my.spec');
+
+    say 'Version is: ' . $spec->version;
+    say 'Spec has an epoch' if $spec->has_epoch;
+
+# DESCRIPTION
+
+__WARNING: This code is actively being worked on, and the API may change.__
+
+RPM::Spec provides simplistic access to the different bits of information a
+spec file provides... It is basically a collection of different parsing
+routines that were scattered through a bunch of other modules.
+
+# CLASS FUNCTIONS
+
+- __new(specfile => [Str|File])__
+
+Create a new RPM::Specfile object.  The only required parameter is 'specfile',
+which is either a string or [Path::Class::File](http://search.cpan.org/perldoc?Path::Class::File) object pointing to the
+location of the specfile.
+
+# METHODS
+
+## Tag Functions
+
+These methods each return the value of the given tag.  If the tag is not
+present, undef is returned.
+
+- __license__
+
+- __epoch__
+
+- __release__
+
+- __version__
+
+- __source0__
+
+Note this will pick up from either of "Source" or "Source0" tags.
+
+- __name__
+
+- __url__
+
+- __summary__
+
+- __middle__
+
+The "middle" of a spec; e.g. everything from the first %description until the
+changelog starts.
+
+## Dependency Functions
+
+Documentation as this interface is likely to change in the Very Near Future.
+
+## Content Functions
+
+- __content()__
+
+Returns an array of strings representing the specfile.
+
+- __has_content__
+
+Is the file empty?
+
+- __num_lines_in_content__
+
+Returns the line count of the specfile.
+
+- __grep_content(sub { ... })__
+
+Given a coderef, greps through the content with it.  See also [grep](http://search.cpan.org/perldoc?grep).
+
+# CAVEATS
+
+## No macro parsing
+
+Macros are not evaluated.  e.g., if "Release: 1%{?dist}" is in your spec file,
+"1%{?dist}" will be returned by release().
+
+## Read only!
+
+We can't make any changes.
+
+# SEE ALSO
+
+L<...>
+
+# BUGS AND LIMITATIONS
+
+Please report problems to Chris Weyl <cweyl@alumni.drew.edu>, or (preferred)
+to this package's RT tracker at <bug-RPM-Spec@rt.cpan.org>.
+
+Patches are welcome.
+
+# AUTHOR
+
+Chris Weyl  <cweyl@alumni.drew.edu>
+
+
+
+# LICENSE AND COPYRIGHT
+
+Copyright (c) 2009 Chris Weyl <cweyl@alumni.drew.edu>
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the
+
+    Free Software Foundation, Inc.
+    59 Temple Place, Suite 330
+    Boston, MA  02111-1307  USA
